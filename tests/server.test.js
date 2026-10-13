@@ -307,6 +307,27 @@ test("rejects analysis requests from a different website", async (t) => {
   assert.equal(response.status, 403);
 });
 
+test("limits public analysis requests per client IP", async (t) => {
+  let geminiCalls = 0;
+  const baseUrl = await startServer(t, {
+    analysisRateLimit: { maxRequests: 1, windowMs: 60_000 },
+    getApiKey: () => "test-api-key",
+    getGroqApiKey: () => "",
+    requestGemini: async () => {
+      geminiCalls += 1;
+      return successfulGeminiResponse();
+    },
+  });
+  const first = await analyzeFile(baseUrl, "Especificação.", "especificacao.txt");
+  const second = await analyzeFile(baseUrl, "Especificação.", "especificacao.txt");
+
+  assert.equal(first.status, 200);
+  assert.equal(second.status, 429);
+  assert.ok(Number(second.headers.get("retry-after")) > 0);
+  assert.match((await second.json()).error, /Limite de análises atingido/);
+  assert.equal(geminiCalls, 1);
+});
+
 test("shows a clear message when the free Gemini quota is reached", async (t) => {
   const baseUrl = await startServer(t, {
     getApiKey: () => "test-api-key",

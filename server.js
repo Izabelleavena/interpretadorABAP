@@ -14,6 +14,8 @@ const MAX_DOCX_EXPANDED_SIZE = 50 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = new Set([".pdf", ".docx", ".txt"]);
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
+const ANALYSIS_RATE_WINDOW_MS = 15 * 60 * 1000;
+const ANALYSIS_RATE_LIMIT = 10;
 
 const analysisSchema = {
   type: "OBJECT",
@@ -215,6 +217,38 @@ function normalizeAnalysis(analysis, provider) {
     throw new ProviderError(provider, 502, `${provider} retornou uma análise sem etapas de execução.`);
   }
   return normalized;
+}
+
+function createAnalysisRateLimiter({ maxRequests = ANALYSIS_RATE_LIMIT, windowMs = ANALYSIS_RATE_WINDOW_MS } = {}) {
+  const clients = new Map();
+  let requestsSinceCleanup = 0;
+
+  return (request, response, next) => {
+    const now = Date.now();
+    const clientId = request.ip || request.socket.remoteAddress || "unknown";
+    let client = clients.get(clientId);
+
+    if (!client || client.resetAt <= now) {
+      client = { count: 0, resetAt: now + windowMs };
+      clients.set(clientId, client);
+    }
+
+    if (client.count >= maxRequests) {
+      response.setHeader("Retry-After", String(Math.max(1, Math.ceil((client.resetAt - now) / 1000))));
+      response.status(429).json({ error: "Limite de análises atingido. Aguarde alguns minutos e tente novamente." });
+      return;
+    }
+
+    client.count += 1;
+    requestsSinceCleanup += 1;
+    if (requestsSinceCleanup >= 100) {
+      for (const [id, entry] of clients) {
+        if (entry.resetAt <= now) clients.delete(id);
+      }
+      requestsSinceCleanup = 0;
+    }
+    next();
+  };
 }
 
 function specificationPrompt(text) {
@@ -511,9 +545,11 @@ function createApp({
   requestGroq = fetch,
   getApiKey = () => process.env.GEMINI_API_KEY,
   getGroqApiKey = () => process.env.GROQ_API_KEY,
+  analysisRateLimit,
 } = {}) {
   const app = express();
   app.disable("x-powered-by");
+  app.set("trust proxy", process.env.NODE_ENV === "production" ? 1 : false);
   app.use((_request, response, next) => {
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
@@ -548,7 +584,11 @@ function createApp({
   });
   app.get("/api/health", (_request, response) => response.json({ status: "ok" }));
 
-  app.post("/api/analyze", upload.single("specification"), async (request, response, next) => {
+  app.post(
+    "/api/analyze",
+    createAnalysisRateLimiter(analysisRateLimit),
+    upload.single("specification"),
+    async (request, response, next) => {
     try {
       const requestOrigin = request.get("origin");
       if (requestOrigin && requestOrigin !== `${request.protocol}://${request.get("host")}`) {
@@ -646,7 +686,8 @@ function createApp({
     } catch (error) {
       next(error);
     }
-  });
+    },
+  );
 
   app.use((error, _request, response, _next) => {
     if (error instanceof multer.MulterError) {
@@ -674,7 +715,7 @@ export { createApp };
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const port = Number(process.env.PORT) || 3000;
-  createApp().listen(port, "127.0.0.1", () => {
-    console.log(`Assistente SAP ABAP disponível em http://localhost:${port}`);
+  createApp().listen(port, "0.0.0.0", () => {
+    console.log(`Assistente SAP ABAP disponível na porta ${port}`);
   });
 }

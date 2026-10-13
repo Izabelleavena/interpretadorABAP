@@ -46,6 +46,19 @@ O Groq tem limites de uso e disponibilidade próprios, inclusive na faixa gratui
 
 Depois disso, selecione uma EF e clique em **Analisar EF com IA**. O site processa o arquivo, tenta o Gemini e, quando necessário, usa o Groq como contingência. Use o endereço `http://127.0.0.1:3000`; abrir `index.html` diretamente não inicia o servidor necessário para a análise.
 
+## Publicar online no Render
+
+O aplicativo inclui `render.yaml` para publicar a interface e o servidor Node.js como um único serviço:
+
+1. Acesse o [Render Dashboard](https://dashboard.render.com/) e conecte sua conta GitHub, se solicitado.
+2. Clique em **New** → **Blueprint** e selecione o repositório `Izabelleavena/interpretadorABAP`.
+3. Na configuração do serviço, informe `GEMINI_API_KEY` e `GROQ_API_KEY` nos campos de variáveis secretas. As chaves ficam no Render; não as coloque no GitHub.
+4. Confirme a criação do serviço. O Render instala as dependências, inicia o Node.js e verifica `/api/health`. Ao concluir, abra o endereço `https://...onrender.com` indicado no painel.
+
+O plano gratuito pode suspender o serviço após 15 minutos sem acessos; a primeira abertura depois disso pode levar cerca de um minuto. O sistema limita cada endereço IP a 10 análises por janela de 15 minutos, como proteção básica contra uso excessivo. Esse limite não substitui autenticação: qualquer pessoa que encontrar o endereço público pode tentar usar as cotas das APIs. Não use o serviço público com documentos confidenciais.
+
+O GitHub Pages sozinho não executa este backend Node.js; use o endereço do Render para acessar o aplicativo online. Consulte as [limitações do plano gratuito do Render](https://render.com/docs/free).
+
 ## Cota gratuita e privacidade
 
 Os modelos `gemini-3.5-flash` e `openai/gpt-oss-20b` podem estar disponíveis nos planos gratuitos de seus provedores, sujeitos aos limites e à disponibilidade definidos por cada serviço. O site não ativa faturamento nem tenta trocar para um serviço pago. Consulte os [limites e preços do Gemini](https://ai.google.dev/gemini-api/docs/pricing) e os [limites atuais do Groq](https://console.groq.com/docs/rate-limits).
