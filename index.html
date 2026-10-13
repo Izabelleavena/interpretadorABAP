@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Transforme especificações funcionais em um roteiro organizado de execução SAP ABAP."
+    />
+    <title>Assistente ABAP SAP — da EF à execução</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js?v=2" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Assistente ABAP SAP, página inicial">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="m12 10-6 6 6 6m8-12 6 6-6 6m-2-15-4 18" />
+          </svg>
+        </span>
+        <span>SAP <span class="brand-accent">ABAP</span></span>
+      </a>
+      <div class="topbar-note">
+        <span class="status-dot"></span>
+        Workspace de desenvolvimento SAP
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="intro">
+        <p class="eyebrow"><span class="eyebrow-line"></span> SAP DEVELOPMENT WORKSPACE</p>
+        <h1>Da especificação<br />à execução <span>ABAP.</span></h1>
+        <p class="intro-copy">
+          Transforme sua especificação funcional em uma sequência clara de programas, transações e
+          validações no ambiente SAP.
+        </p>
+      </section>
+
+      <section class="workspace" aria-label="Assistente de desenvolvimento ABAP SAP">
+        <div class="upload-card">
+          <div class="card-heading">
+            <div>
+              <p class="section-kicker">ETAPA 1 <span>·</span> ENTRADA</p>
+              <h2>Especificação funcional</h2>
+            </div>
+            <span class="step-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14.5v4A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-4" />
+              </svg>
+            </span>
+          </div>
+
+          <div
+            class="dropzone"
+            id="dropzone"
+          >
+            <div class="upload-illustration" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <path d="M27 7H14a3 3 0 0 0-3 3v28a3 3 0 0 0 3 3h20a3 3 0 0 0 3-3V17L27 7Z" />
+                <path d="M27 7v10h10M17 26h14M17 32h10M17 20h3" />
+                <path d="M24 23v10m0 0-4-4m4 4 4-4" />
+              </svg>
+            </div>
+            <p class="dropzone-title">Adicione a especificação funcional</p>
+            <p class="dropzone-subtitle">PDF com texto, DOCX ou TXT · até 10 MB</p>
+            <input
+              id="file-input"
+              class="file-input"
+              type="file"
+              accept=".pdf,.docx,.txt"
+              aria-label="Selecionar especificação funcional"
+            />
+            <label class="browse-button" for="file-input">Procurar arquivo</label>
+          </div>
+
+          <div class="selected-file" id="selected-file" aria-live="polite" hidden>
+            <span class="file-badge" aria-hidden="true">EF</span>
+            <span class="file-details">
+              <strong id="file-name"></strong>
+              <span id="file-size"></span>
+            </span>
+            <button class="remove-file" id="remove-file" type="button" aria-label="Remover arquivo">×</button>
+          </div>
+
+          <button class="analyze-button" id="analyze-button" type="button" disabled>
+            Analisar EF com IA
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10h12m0 0-5-5m5 5-5 5" />
+            </svg>
+          </button>
+          <p class="privacy-note">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="3" y="7" width="10" height="7" rx="1.5" />
+              <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+            </svg>
+            O texto da EF será enviado ao Gemini e, se ele estiver indisponível, ao Groq. Não envie documentos confidenciais sem autorização.
+          </p>
+        </div>
+
+        <aside class="preview-card" id="preview-card" aria-labelledby="preview-title">
+          <div class="preview-topline">
+            <p class="section-kicker">ETAPA 2 <span>·</span> SAÍDA</p>
+            <span class="preview-label">GEMINI · SAP ABAP</span>
+          </div>
+          <h2 id="preview-title">Seu roteiro de<br />execução ABAP.</h2>
+          <p class="preview-copy">
+            Uma sequência orientada por dependências para implementar e validar o resultado descrito na EF.
+          </p>
+
+          <div class="timeline" aria-label="Exemplo da estrutura do roteiro">
+            <div class="timeline-item">
+              <span class="timeline-number">01</span>
+              <div>
+                <strong>Pré-requisitos SAP</strong>
+                <p>Objetos, dados e condições do ambiente</p>
+              </div>
+              <span class="timeline-arrow" aria-hidden="true">↗</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-number">02</span>
+              <div>
+                <strong>Programas e transações</strong>
+                <p>Ordem de execução e dependências ABAP</p>
+              </div>
+              <span class="timeline-arrow" aria-hidden="true">↗</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-number">03</span>
+              <div>
+                <strong>Testes e validação</strong>
+                <p>Como conferir o resultado esperado da EF</p>
+              </div>
+              <span class="timeline-arrow" aria-hidden="true">↗</span>
+            </div>
+          </div>
+
+          <div class="preview-footer">
+            <span class="sparkle" aria-hidden="true">✳</span>
+            <span>Orientado para desenvolvimento SAP ABAP</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="results-card" id="results-card" aria-labelledby="results-title" hidden>
+        <div class="results-heading">
+          <div>
+            <p class="section-kicker">ANÁLISE AUTOMÁTICA DA EF</p>
+            <h2 id="results-title">Receita de bolo ABAP</h2>
+          </div>
+          <span class="preview-label">GEMINI · COTA GRATUITA</span>
+        </div>
+        <p class="result-summary" id="result-summary"></p>
+        <div class="result-content" id="result-content"></div>
+        <p class="result-disclaimer">
+          Revise nomes de objetos, transações e regras no sistema SAP do projeto antes de executar.
+          A IA pode cometer erros; confirme detalhes técnicos com o time funcional.
+        </p>
+      </section>
+
+      <footer class="page-footer">
+        <span>Do requisito funcional à execução técnica no SAP.</span>
+        <span class="footer-tag">SAP <span>·</span> ABAP</span>
+      </footer>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
